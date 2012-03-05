@@ -7,14 +7,17 @@
 //
 
 #import "AppDelegate.h"
+#import "SoundModel.h"
 
 @implementation AppDelegate
-
+{
+    SoundModel *model;
+}
 @synthesize window = _window;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    // Override point for customization after application launch.
+    model = [[SoundModel alloc] init];
     return YES;
 }
 							
