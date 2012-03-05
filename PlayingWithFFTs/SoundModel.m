@@ -3,7 +3,6 @@
 //  PlayingWithFFTs
 //
 //  Created by Scott Hyndman on 12-03-04.
-//  Copyright (c) 2012 Blu Trumpet. All rights reserved.
 //
 
 #import <AudioToolbox/AudioToolbox.h>
@@ -31,6 +30,9 @@
  * C Callbacks
  *************/
 
+/**
+ * Called when the audio queue requires that a queue be filled with new data.
+ */
 static void audioQueueOutputCallback(void *inUserData, AudioQueueRef inAQ, AudioQueueBufferRef inBuffer) {
     SoundModel *model = (__bridge SoundModel *)inUserData;
     [model fillAndEnqueueBuffer:inBuffer];
