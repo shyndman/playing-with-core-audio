@@ -7,11 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B657546B15059C6C004DC250 /* SongAnalyzer.m in Sources */ = {isa = PBXBuildFile; fileRef = B657546A15059C6C004DC250 /* SongAnalyzer.m */; };
 		B65CFD581503BEB500551741 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B65CFD571503BEB500551741 /* Accelerate.framework */; };
 		B65CFD5B1503D34800551741 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B65CFD5A1503D34800551741 /* CoreAudio.framework */; };
 		B65CFD5D1503D47300551741 /* Sample.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = B65CFD5C1503D47300551741 /* Sample.mp3 */; };
 		B65CFD601503D4ED00551741 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B65CFD5F1503D4ED00551741 /* AudioToolbox.framework */; };
-		B65CFD641503D98400551741 /* SoundModel.m in Sources */ = {isa = PBXBuildFile; fileRef = B65CFD631503D98400551741 /* SoundModel.m */; };
+		B65CFD641503D98400551741 /* SongModel.m in Sources */ = {isa = PBXBuildFile; fileRef = B65CFD631503D98400551741 /* SongModel.m */; };
 		B6CB03701503BD8100821C33 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6CB036F1503BD8100821C33 /* UIKit.framework */; };
 		B6CB03721503BD8100821C33 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6CB03711503BD8100821C33 /* Foundation.framework */; };
 		B6CB03741503BD8100821C33 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6CB03731503BD8100821C33 /* CoreGraphics.framework */; };
@@ -23,12 +24,14 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		B657546915059C6C004DC250 /* SongAnalyzer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SongAnalyzer.h; sourceTree = "<group>"; };
+		B657546A15059C6C004DC250 /* SongAnalyzer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SongAnalyzer.m; sourceTree = "<group>"; };
 		B65CFD571503BEB500551741 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 		B65CFD5A1503D34800551741 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
 		B65CFD5C1503D47300551741 /* Sample.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = Sample.mp3; sourceTree = "<group>"; };
 		B65CFD5F1503D4ED00551741 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
-		B65CFD621503D98400551741 /* SoundModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SoundModel.h; sourceTree = "<group>"; };
-		B65CFD631503D98400551741 /* SoundModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SoundModel.m; sourceTree = "<group>"; };
+		B65CFD621503D98400551741 /* SongModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SongModel.h; sourceTree = "<group>"; };
+		B65CFD631503D98400551741 /* SongModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SongModel.m; sourceTree = "<group>"; };
 		B6CB036B1503BD8100821C33 /* PlayingWithFFTs.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PlayingWithFFTs.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B6CB036F1503BD8100821C33 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		B6CB03711503BD8100821C33 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -69,13 +72,15 @@
 			name = MP3;
 			sourceTree = "<group>";
 		};
-		B65CFD611503D97100551741 /* Model */ = {
+		B65CFD611503D97100551741 /* Audio */ = {
 			isa = PBXGroup;
 			children = (
-				B65CFD621503D98400551741 /* SoundModel.h */,
-				B65CFD631503D98400551741 /* SoundModel.m */,
+				B65CFD621503D98400551741 /* SongModel.h */,
+				B65CFD631503D98400551741 /* SongModel.m */,
+				B657546915059C6C004DC250 /* SongAnalyzer.h */,
+				B657546A15059C6C004DC250 /* SongAnalyzer.m */,
 			);
-			name = Model;
+			name = Audio;
 			sourceTree = "<group>";
 		};
 		B6CB03601503BD8100821C33 = {
@@ -111,7 +116,7 @@
 		B6CB03751503BD8100821C33 /* PlayingWithFFTs */ = {
 			isa = PBXGroup;
 			children = (
-				B65CFD611503D97100551741 /* Model */,
+				B65CFD611503D97100551741 /* Audio */,
 				B65CFD5E1503D48900551741 /* MP3 */,
 				B6CB037E1503BD8100821C33 /* AppDelegate.h */,
 				B6CB037F1503BD8100821C33 /* AppDelegate.m */,
@@ -201,7 +206,8 @@
 				B6CB037C1503BD8100821C33 /* main.m in Sources */,
 				B6CB03801503BD8100821C33 /* AppDelegate.m in Sources */,
 				B6CB03861503BD8100821C33 /* ViewController.m in Sources */,
-				B65CFD641503D98400551741 /* SoundModel.m in Sources */,
+				B65CFD641503D98400551741 /* SongModel.m in Sources */,
+				B657546B15059C6C004DC250 /* SongAnalyzer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

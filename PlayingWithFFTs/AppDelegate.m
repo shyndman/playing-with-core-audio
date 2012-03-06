@@ -6,17 +6,17 @@
 //
 
 #import "AppDelegate.h"
-#import "SoundModel.h"
+#import "SongModel.h"
 
 @implementation AppDelegate
 {
-    SoundModel *model;
+    SongModel *model;
 }
 @synthesize window = _window;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    model = [[SoundModel alloc] init];
+    model = [[SongModel alloc] init];
     return YES;
 }
 							
