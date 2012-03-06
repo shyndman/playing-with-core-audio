@@ -13,6 +13,13 @@
 - (void)initializeInternal;
 @end
 
+static void printFloatArray(NSString *name, float *arr, int length) {
+    NSLog(@"Printing %@ of length %d", name, length);
+    for (int i = 0; i < length; i++) {
+        NSLog(@"%@[%d] = %f", name, i, arr[i]);
+    }
+}
+
 @implementation SongAnalyzer
 {
     SongModel *_songModel;
@@ -21,8 +28,7 @@
     int _fftHalfN;
     COMPLEX_SPLIT A;
     FFTSetup _fftSetup;
-    float *_originalReal;
-    float *_obtainedReal;
+    float *_inputReal;
     float *_hanningWindow;
     float *_windowedReal;
     int _stride;
@@ -54,9 +60,8 @@
     _hanningWindow = (float *) malloc(_fftN * sizeof(float));    
     vDSP_hann_window(_hanningWindow, _fftN, 0);
     
-    _originalReal = (float *) malloc(_fftN * sizeof(float));
+    _inputReal = (float *) malloc(_fftN * sizeof(float));
     _windowedReal = (float *) malloc(_fftN * sizeof(float));
-    _obtainedReal = (float *) malloc(_fftN * sizeof(float));
     _fftSetup = vDSP_create_fftsetup(_fftLog2n, FFT_RADIX2);
 }
 
@@ -74,11 +79,19 @@
     // Convert AudioSampleType (SInt16) into floats between -1.0 and 1.0
 
     for (int i = 0; i < _fftN; i++)
-        _originalReal[i] = (samples[i] + 0.5) / 32767.5;
+        _inputReal[i] = (samples[i] + 0.5) / 32767.5;
 
+#ifdef DEBUG
+    printFloatArray(@"input", _inputReal, _fftN);
+#endif
+    
     // Window the input
     
-    vDSP_vmul(_originalReal, 1, _hanningWindow, 1, _windowedReal, 1, _fftN);
+    vDSP_vmul(_inputReal, 1, _hanningWindow, 1, _windowedReal, 1, _fftN);
+
+#ifdef DEBUG
+    printFloatArray(@"windowed", _windowedReal, _fftN);
+#endif
     
     // Convert our real input (_windowedReal) into even-odd form
     
@@ -88,7 +101,13 @@
 
     vDSP_fft_zrip(_fftSetup, &A, 1, _fftLog2n, FFT_FORWARD);
     
+    // Calculate magnitudes
     
+    vDSP_zvmags(&A, 1, A.realp, 1, _fftHalfN);
+    
+#ifdef DEBUG
+    printFloatArray(@"frequency", A.realp, _fftHalfN);
+#endif
 }
 
 @end

@@ -6,13 +6,13 @@
 //
 
 #import "ViewController.h"
+#import "SongModel.h"
+#import "SongAnalyzer.h"
 
 @implementation ViewController
-
-- (void)didReceiveMemoryWarning
 {
-    [super didReceiveMemoryWarning];
-    // Release any cached data, images, etc that aren't in use.
+    SongModel *song;
+    SongAnalyzer *analyzer;
 }
 
 #pragma mark - View lifecycle
@@ -20,7 +20,14 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	// Do any additional setup after loading the view, typically from a nib.
+	
+    song     = [[SongModel alloc] init];
+    analyzer = [[SongAnalyzer alloc] initWithSong:song 
+                                           fftBits:10];
+}
+
+- (IBAction)analyze:(id)sender {
+    [analyzer analyze];
 }
 
 - (void)viewDidUnload

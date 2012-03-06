@@ -283,6 +283,7 @@ static void audioQueueOutputCallback(void *inUserData, AudioQueueRef inAQ, Audio
 - (void)play {
     OSStatus error = AudioQueueStart(_audioQueue, nil);
     _startSampleTime = 0.0;
+    _isPlaying = YES;
     
     if (error) {
         NSLog(@"Error starting audio queue, error=%ld", error);

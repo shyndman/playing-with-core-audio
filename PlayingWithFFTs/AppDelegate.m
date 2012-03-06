@@ -9,14 +9,11 @@
 #import "SongModel.h"
 
 @implementation AppDelegate
-{
-    SongModel *model;
-}
+
 @synthesize window = _window;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    model = [[SongModel alloc] init];
     return YES;
 }
 							
