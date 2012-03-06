@@ -26,7 +26,7 @@ static void printFloatArray(NSString *name, float *arr, int length) {
     short _fftLog2n;
     int _fftN;
     int _fftHalfN;
-    COMPLEX_SPLIT A;
+    COMPLEX_SPLIT _fourierOutput;
     FFTSetup _fftSetup;
     float *_inputReal;
     float *_hanningWindow;
@@ -54,8 +54,8 @@ static void printFloatArray(NSString *name, float *arr, int length) {
     _fftHalfN = _fftN / 2;
     _stride = 1;
     
-    A.realp = (float *) malloc(_fftHalfN * sizeof(float));
-    A.imagp = (float *) malloc(_fftHalfN * sizeof(float));
+    _fourierOutput.realp = (float *) malloc(_fftHalfN * sizeof(float));
+    _fourierOutput.imagp = (float *) malloc(_fftHalfN * sizeof(float));
     
     _hanningWindow = (float *) malloc(_fftN * sizeof(float));    
     vDSP_hann_window(_hanningWindow, _fftN, 0);
@@ -95,18 +95,18 @@ static void printFloatArray(NSString *name, float *arr, int length) {
     
     // Convert our real input (_windowedReal) into even-odd form
     
-    vDSP_ctoz((COMPLEX *)_windowedReal, 2, &A, 1, _fftHalfN);
+    vDSP_ctoz((COMPLEX *)_windowedReal, 2, &_fourierOutput, 1, _fftHalfN);
     
     // Perform the fast fourier transform
 
-    vDSP_fft_zrip(_fftSetup, &A, 1, _fftLog2n, FFT_FORWARD);
+    vDSP_fft_zrip(_fftSetup, &_fourierOutput, 1, _fftLog2n, FFT_FORWARD);
     
     // Calculate magnitudes
     
-    vDSP_zvmags(&A, 1, A.realp, 1, _fftHalfN);
+    vDSP_zvmags(&_fourierOutput, 1, _fourierOutput.realp, 1, _fftHalfN);
     
 #ifdef DEBUG
-    printFloatArray(@"frequency", A.realp, _fftHalfN);
+    printFloatArray(@"frequency", _fourierOutput.realp, _fftHalfN);
 #endif
 }
 
