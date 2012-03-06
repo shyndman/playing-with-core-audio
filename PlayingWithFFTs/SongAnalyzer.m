@@ -10,15 +10,16 @@
 #import "SongAnalyzer.h"
 
 @interface SongAnalyzer()
-- (void)initializeInternal;
+- (void)initializeFFT;
 @end
 
-static void printFloatArray(NSString *name, float *arr, int length) {
-    NSLog(@"Printing %@ of length %d", name, length);
-    for (int i = 0; i < length; i++) {
+#ifdef DEBUG
+// Debug code
+static void printFloatArray(NSString *name, float *arr, size_t length) {
+    for (int i = 0; i < length; i++) 
         NSLog(@"%@[%d] = %f", name, i, arr[i]);
-    }
 }
+#endif
 
 @implementation SongAnalyzer
 {
@@ -43,13 +44,13 @@ static void printFloatArray(NSString *name, float *arr, int length) {
         _songModel = songModel;
         _fftLog2n = numberOfBits;
         
-        [self initializeInternal];
+        [self initializeFFT];
     }
     
     return self;
 }
 
-- (void)initializeInternal {
+- (void)initializeFFT {
     _fftN = 1 << _fftLog2n;
     _fftHalfN = _fftN / 2;
     _stride = 1;
@@ -76,7 +77,8 @@ static void printFloatArray(NSString *name, float *arr, int length) {
     if (samples == nil)
         return;
     
-    // Convert AudioSampleType (SInt16) into floats between -1.0 and 1.0
+    // Convert AudioSampleTypes (SInt16s) into floats between -1.0 and 1.0 (required by
+    // the DSP library).
 
     for (int i = 0; i < _fftN; i++)
         _inputReal[i] = (samples[i] + 0.5) / 32767.5;
@@ -85,7 +87,8 @@ static void printFloatArray(NSString *name, float *arr, int length) {
     printFloatArray(@"input", _inputReal, _fftN);
 #endif
     
-    // Window the input
+    // Window the input (improves the ability to distinguish between waves of different
+    // frequencies)
     
     vDSP_vmul(_inputReal, 1, _hanningWindow, 1, _windowedReal, 1, _fftN);
 
@@ -101,7 +104,7 @@ static void printFloatArray(NSString *name, float *arr, int length) {
 
     vDSP_fft_zrip(_fftSetup, &_fourierOutput, 1, _fftLog2n, FFT_FORWARD);
     
-    // Calculate magnitudes
+    // Calculate magnitudes (will output to the real part of the COMPLEX_SPLIT)
     
     vDSP_zvmags(&_fourierOutput, 1, _fourierOutput.realp, 1, _fftHalfN);
     
