@@ -12,13 +12,6 @@
 - (void)initializeFFT;
 @end
 
-#ifdef DEBUG
-static void printFloatArray(NSString *name, float *arr, size_t length) {
-    for (int i = 0; i < length; i++) 
-        NSLog(@"%@[%d] = %f", name, i, arr[i]);
-}
-#endif
-
 @implementation SongAnalyzer
 {
     SongModel *_songModel;
@@ -66,7 +59,8 @@ static void printFloatArray(NSString *name, float *arr, size_t length) {
 
 - (void)analyze {
     
-    if (!_songModel.isPlaying) // We don't analyze stopped songs
+
+    if (!_songModel.isPlaying) // TODO Change this to hasData. A stopped song should be analyzable.
         return;
     
     // Get the samples
@@ -77,12 +71,14 @@ static void printFloatArray(NSString *name, float *arr, size_t length) {
     
     // Convert AudioSampleTypes (SInt16s) into floats between -1.0 and 1.0 (required by
     // the DSP library).
+    
+    // TODO Figure out how to vectorize this
 
     for (int i = 0; i < _fftN; i++)
         _inputReal[i] = (samples[i] + 0.5) / 32767.5;
 
 #ifdef DEBUG
-    printFloatArray(@"input", _inputReal, _fftN);
+//    printFloatArray(@"input", _inputReal, _fftN);
 #endif
     
     // Window the input (improves the ability to distinguish between waves of different
@@ -91,7 +87,7 @@ static void printFloatArray(NSString *name, float *arr, size_t length) {
     vDSP_vmul(_inputReal, 1, _hanningWindow, 1, _windowedReal, 1, _fftN);
 
 #ifdef DEBUG
-    printFloatArray(@"windowed", _windowedReal, _fftN);
+//    printFloatArray(@"windowed", _windowedReal, _fftN);
 #endif
     
     // Convert our real input (_windowedReal) into even-odd form
@@ -107,7 +103,7 @@ static void printFloatArray(NSString *name, float *arr, size_t length) {
     vDSP_zvmags(&_fourierOutput, 1, _fourierOutput.realp, 1, _fftHalfN);
     
 #ifdef DEBUG
-    printFloatArray(@"frequency", _fourierOutput.realp, _fftHalfN);
+//    printFloatArray(@"frequency", _fourierOutput.realp, _fftHalfN);
 #endif
 }
 

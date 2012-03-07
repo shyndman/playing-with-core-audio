@@ -170,6 +170,10 @@ static void audioQueueOutputCallback(void *inUserData, AudioQueueRef inAQ, Audio
         return;
     }
     
+    //!!! Debug code
+    AudioQueueSetParameter(_audioQueue, kAudioQueueParam_Volume, 0.0);
+    //!!! End debug code
+    
     for (int i = 0; i < NUM_BUFFERS; i++) {
         AudioQueueBufferRef buffer;
         error = AudioQueueAllocateBuffer(_audioQueue, BYTES_PER_BUFFER, &buffer); 
