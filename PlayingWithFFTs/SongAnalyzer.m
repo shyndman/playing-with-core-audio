@@ -67,7 +67,7 @@
     
     // Get the samples
     
-    AudioSampleType *samples = [_songModel nextSamplesWithLength: _fftN];
+//    AudioSampleType *samples = [_songModel nextSamplesWithLength: _fftN];
         
 #ifdef DEBUG
 //    [Debug printSInt16Array:samples
@@ -75,16 +75,16 @@
 //                      name:@"input"];
 #endif
     
-    if (samples == nil)
-        return nil;
+//    if (samples == nil)
+//        return nil;
     
     // Convert AudioSampleTypes (SInt16s) into floats between -1.0 and 1.0 (required by
     // the DSP library).
     
     // TODO Figure out how to vectorize this
 
-    for (int i = 0; i < _fftN; i++)
-        _inputReal[i] = (samples[i] + 0.5) / 32767.5;
+//    for (int i = 0; i < _fftN; i++)
+//        _inputReal[i] = (samples[i] + 0.5) / 32767.5;
 
 #ifdef DEBUG
 //    [Debug printFloatArray:_inputReal
@@ -122,10 +122,7 @@
     
     // Build and return the input and output of the analysis
     
-    return [[FrequencyData alloc] initWithSignal:_inputReal 
-                                    signalLength:_fftN  
-                             frequencyMagnitudes:_fourierOutput.realp
-                                 magnitudeLength:_fftHalfN];
+    return nil;
 }
 
 @end

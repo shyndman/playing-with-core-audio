@@ -10,20 +10,24 @@
 
 #import "PlaybackInterfaceViewController.h"
 #import "SongModel.h"
-#import "SongAnalyzer.h"
 #import "Debug.h"
+#import "FrameData.h"
+
+@interface PlaybackInterfaceViewController()
+@property (nonatomic, strong) FrameData *frameData;
+@end
 
 @implementation PlaybackInterfaceViewController
 {
     SongModel *song;
-    SongAnalyzer *analyzer;
 
-    //! temp
-    float fov;
+    FrameData *frameData;
     
     //! temp
-    FrequencyData *freqData; 
+    float fov;
 }
+
+@synthesize frameData = _frameData;
 
 #pragma mark - View lifecycle
 
@@ -33,7 +37,6 @@
     [super viewDidLoad];
     
     song         = [[SongModel alloc] init];
-    analyzer     = [[SongAnalyzer alloc] initWithSong:song fftBits:10];
     fov          = GLKMathDegreesToRadians(65);
     
     EAGLContext *context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
@@ -66,7 +69,9 @@
 #endif
     
     // FFT based on current time
-    freqData = [analyzer analyze];
+    frameData = [song nextSamplesWithLength:1024];
+    
+    // TODO Add null handling
     
 #ifdef LOG_UPDATE
     NSDate *methodFinish = [NSDate date];
@@ -76,27 +81,15 @@
 }
 
 - (void)glkView:(GLKView *)view drawInRect:(CGRect)rect {
-//    size_t len = freqData->frequencyMagnitudesLength;
-    size_t len = freqData->sourceSignalLength / 8;
+    size_t len = frameData->numSamples / 4;
     float vertices[3 * len];
     
-//    for (int i = 1; i < len; i++) {
-//        vertices[((i - 1) * 3) + 0] = i * 2 - 512; // x
-//        vertices[((i - 1) * 3) + 1] = freqData->frequencyMagnitudes[i - 1] * 0.1 - 200;
-//        vertices[((i - 1) * 3) + 2] = 0;
-//         
-////        NSLog(@"vertex[%d].z = %lf", i, freqData->frequencyMagnitudes[i] * 0.02);
-//    }
-
     for (int i = 0; i < len; i++) {
-        vertices[(i * 3) + 0] = i * 8 - 512; // x
-        vertices[(i * 3) + 1] = freqData->sourceSignal[i] * 400 - 200;
+        vertices[(i * 3) + 0] = i * 4 - 512; // x
+        vertices[(i * 3) + 1] = ((frameData->samples[i] + 0.5) / 32767.5) * 400 - 100;
         vertices[(i * 3) + 2] = 0;
-        
-//        NSLog(@"vertex[%d].z = %lf", i, freqData->sourceSignal[i]);
     }
 
-    
     glClearColor(0.1, 0, 0.1, 1);
     glClear(GL_COLOR_BUFFER_BIT);
     
@@ -113,7 +106,7 @@
     [effect prepareToDraw];
 
     // Draw!
-    glLineWidth(2);
+    glLineWidth(1.5 + 3 * frameData->levelState.mAveragePower);
     glEnableVertexAttribArray(GLKVertexAttribPosition);
     glVertexAttribPointer(GLKVertexAttribPosition, 
                           3, // Number of components per vertex

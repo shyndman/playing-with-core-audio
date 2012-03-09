@@ -8,6 +8,8 @@
 #import <Foundation/Foundation.h>
 #import <AudioToolbox/AudioToolbox.h>
 
+#import "FrameData.h"
+
 @interface SongModel : NSObject
 
 /** 
@@ -26,6 +28,6 @@
  *
  * @param length The number of desired audio samples to read.
  */
-- (AudioSampleType *)nextSamplesWithLength:(int)length;
+- (FrameData *)nextSamplesWithLength:(int)length;
 
 @end

@@ -171,6 +171,14 @@ static void audioQueueOutputCallback(void *inUserData, AudioQueueRef inAQ, Audio
         return;
     }
     
+    UInt32 enable = 1;
+    AudioQueueSetProperty(_audioQueue, kAudioQueueProperty_EnableLevelMetering, &enable, sizeof(enable));
+    
+    if (error) {
+        NSLog(@"Error enabling metering on audio queue, error=%ld", error);
+        return;
+    }
+    
     //!!! Debug code
     AudioQueueSetParameter(_audioQueue, kAudioQueueParam_Volume, 10.0);
     //!!! End debug code
@@ -189,7 +197,7 @@ static void audioQueueOutputCallback(void *inUserData, AudioQueueRef inAQ, Audio
     }
 }
 
-- (AudioSampleType *)nextSamplesWithLength:(int)length {
+- (FrameData *)nextSamplesWithLength:(int)length {
     
     // Arg check
     
@@ -250,12 +258,10 @@ static void audioQueueOutputCallback(void *inUserData, AudioQueueRef inAQ, Audio
                ((SInt16 *)currentBuffer->mAudioData) + samplesIntoCurrentBuffer, 
                length * sizeof(AudioSampleType));
     }
-        
-//    [Debug printSInt16Array:samples
-//                 withLength:length
-//                       name:@"samples"];
     
-    return samples;
+    return [[FrameData alloc] initWithSamples:samples 
+                                       length:length 
+                                   levelState:levels];
 }
 
 - (void)fillAndEnqueueBuffer:(AudioQueueBufferRef)buffer {
