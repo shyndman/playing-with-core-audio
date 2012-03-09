@@ -6,8 +6,9 @@
 //
 
 #import <AudioToolbox/AudioToolbox.h>
-#import "SongModel.h"
 
+#import "SongModel.h"
+#import "Debug.h"
 
 #define NUM_BUFFERS         3
 #define SAMPLES_PER_FRAME   1
@@ -171,7 +172,7 @@ static void audioQueueOutputCallback(void *inUserData, AudioQueueRef inAQ, Audio
     }
     
     //!!! Debug code
-    AudioQueueSetParameter(_audioQueue, kAudioQueueParam_Volume, 0.0);
+    AudioQueueSetParameter(_audioQueue, kAudioQueueParam_Volume, 10.0);
     //!!! End debug code
     
     for (int i = 0; i < NUM_BUFFERS; i++) {
@@ -192,7 +193,7 @@ static void audioQueueOutputCallback(void *inUserData, AudioQueueRef inAQ, Audio
     
     // Arg check
     
-    assert(length < FRAMES_PER_BUFFER);
+    assert(length <= FRAMES_PER_BUFFER);
 
     // Get the current sample time in the audio queue
     
@@ -205,9 +206,20 @@ static void audioQueueOutputCallback(void *inUserData, AudioQueueRef inAQ, Audio
         return nil;
     }
     
+    // Get the metering levels
+    
+    AudioQueueLevelMeterState levels;
+    UInt32 dataSize = sizeof(levels);
+    error = AudioQueueGetProperty(_audioQueue, kAudioQueueProperty_CurrentLevelMeter, &levels, &dataSize);
+    
+    if (error) {
+        NSLog(@"Error getting current time from queue, error=%ld", error);
+        return nil;
+    }
+    
     // Calculate how many samples we are into the current buffer
     
-    Float64 timePlayedSinceReference = timestamp.mSampleTime - _startSampleTime;
+    Float64 timePlayedSinceReference = (timestamp.mSampleTime - 2048) - _startSampleTime;
     UInt32 samplesIntoCurrentBuffer = (UInt32) fmod(timePlayedSinceReference, FRAMES_PER_BUFFER);
     UInt32 samplesAvailableFromCurrentBuffer = FRAMES_PER_BUFFER - samplesIntoCurrentBuffer;
         
@@ -216,24 +228,32 @@ static void audioQueueOutputCallback(void *inUserData, AudioQueueRef inAQ, Audio
     AudioSampleType *samples = malloc(sizeof(AudioSampleType) * length);
     AudioQueueBufferRef currentBuffer = _buffers[_bufferBeingPlayed];
     
-    // Copy samples into the sample buffer
+//    [Debug printSInt16Array:currentBuffer->mAudioData
+//                 withLength:FRAMES_PER_BUFFER
+//                       name:@"buffer"];
     
+    // Copy samples into the sample buffer
+
     if (length > samplesAvailableFromCurrentBuffer) {
         memcpy(samples, 
-               &currentBuffer->mAudioData[samplesIntoCurrentBuffer], 
+               ((SInt16 *)currentBuffer->mAudioData) + samplesIntoCurrentBuffer,
                samplesAvailableFromCurrentBuffer * sizeof(AudioSampleType));
         
         UInt32 sampleCountFromNextBuffer = length - samplesAvailableFromCurrentBuffer;
         AudioQueueBufferRef nextBuffer = _buffers[(_bufferBeingPlayed + 1) % 3];
         
-        memcpy(&samples[samplesAvailableFromCurrentBuffer], 
+        memcpy(samples + samplesAvailableFromCurrentBuffer, 
                nextBuffer->mAudioData, 
                sampleCountFromNextBuffer * sizeof(AudioSampleType));
     } else {
         memcpy(samples, 
-               &currentBuffer->mAudioData[samplesIntoCurrentBuffer], 
+               ((SInt16 *)currentBuffer->mAudioData) + samplesIntoCurrentBuffer, 
                length * sizeof(AudioSampleType));
     }
+        
+//    [Debug printSInt16Array:samples
+//                 withLength:length
+//                       name:@"samples"];
     
     return samples;
 }
@@ -251,9 +271,11 @@ static void audioQueueOutputCallback(void *inUserData, AudioQueueRef inAQ, Audio
     bufferList.mBuffers[0].mDataByteSize = buffer->mAudioDataBytesCapacity;
     
     // Read from the file
-    
-    OSStatus error = ExtAudioFileRead(_sourceFile, &loadedFrames, &bufferList);
-    
+    OSStatus error;
+    @synchronized(self) {
+    error = ExtAudioFileRead(_sourceFile, &loadedFrames, &bufferList);
+    }
+
     if (error) {
         NSLog(@"Error reading audio file, error=%ld", error);
         return;
@@ -264,6 +286,10 @@ static void audioQueueOutputCallback(void *inUserData, AudioQueueRef inAQ, Audio
     // Set the length of the buffer to loaded bytes
     
     buffer->mAudioDataByteSize = loadedFrames * sizeof(AudioSampleType);
+    
+//    [Debug printSInt16Array:buffer->mAudioData
+//                 withLength:loadedFrames
+//                       name:@"loaded"];
     
     // Enqueue the buffer
     
